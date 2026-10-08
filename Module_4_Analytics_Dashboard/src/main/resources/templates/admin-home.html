@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Admin Home | SHEMS</title>
+
+<style>
+:root {
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --primary:#2563eb;
+  --sidebar:#0f172a;
+  --border:#e2e8f0;
+  --success:#16a34a;
+}
+
+body.dark {
+  --bg:#0b1220;
+  --card:#111827;
+  --text:#f8fafc;
+  --muted:#9ca3af;
+  --primary:#3b82f6;
+  --border:#1f2937;
+}
+
+body {
+  margin:0;
+  font-family:Segoe UI, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s;
+}
+
+/* ===== SIDEBAR (MATCHES DASHBOARD) ===== */
+.sidebar {
+  width:220px;
+  height:100vh;
+  background:var(--sidebar);
+  position:fixed;
+  padding-top:30px;
+}
+.sidebar h2 {
+  text-align:center;
+  margin-bottom:30px;
+  letter-spacing:1px;
+  color:white;
+}
+.sidebar a {
+  display:block;
+  color:#cbd5e1;
+  padding:12px 25px;
+  text-decoration:none;
+  font-size:15px;
+}
+.sidebar a:hover,
+.sidebar a.active {
+  background:#1e293b;
+  color:white;
+  font-weight:600;
+}
+
+/* ===== HEADER (IDENTICAL STYLE) ===== */
+.header {
+  margin-left:220px;
+  background:var(--primary);
+  color:white;
+  padding:20px 30px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.header h1 {
+  margin:0;
+  font-size:22px;
+}
+
+/* ===== THEME TOGGLE (RESTORED) ===== */
+.theme-switch {
+  width:46px;
+  height:24px;
+  background:#bfdbfe;
+  border-radius:20px;
+  position:relative;
+  cursor:pointer;
+}
+.theme-switch::before {
+  content:"";
+  position:absolute;
+  width:18px;
+  height:18px;
+  background:white;
+  border-radius:50%;
+  top:3px;
+  left:3px;
+  transition:.3s;
+}
+body.dark .theme-switch { background:#60a5fa; }
+body.dark .theme-switch::before { transform:translateX(22px); }
+
+/* ===== MAIN ===== */
+.main {
+  margin-left:220px;
+  padding:30px;
+}
+
+/* ===== STATUS STRIP ===== */
+.system-context {
+  margin-bottom:18px;
+  font-size:14px;
+  color:var(--muted);
+}
+.system-context .ok {
+  color:var(--success);
+  font-weight:600;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:20px 22px;
+  margin-bottom:22px;
+  box-shadow:0 4px 12px rgba(0,0,0,.06);
+}
+
+/* ===== ADMIN ACTION GRID ===== */
+.admin-actions {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;
+  margin-top:12px;
+}
+
+/* ===== ACTION BOX ===== */
+.action-box {
+  background:#eef2ff;
+  border-left:4px solid var(--primary);
+  padding:14px 16px;
+  border-radius:10px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  min-height:120px;
+  transition:.2s ease;
+}
+
+body.dark .action-box { background:#1f2937; }
+
+.action-box:hover {
+  transform:translateY(-4px);
+  box-shadow:0 10px 20px rgba(37,99,235,0.18);
+}
+
+.action-box h3 {
+  margin:0;
+  font-size:12px;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+
+.action-box p {
+  margin:6px 0 12px;
+  font-size:14px;
+  font-weight:600;
+}
+
+.action-box a {
+  align-self:flex-start;
+  background:var(--primary);
+  color:white;
+  padding:6px 12px;
+  border-radius:6px;
+  font-size:12px;
+  font-weight:600;
+  text-decoration:none;
+}
+.action-box a:hover { background:#1d4ed8; }
+
+</style>
+
+<script>
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+}
+window.onload = function () {
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+  }
+};
+</script>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>SHEMS</h2>
+  <a href="/admin" class="active">Home</a>
+  <a href="/adminScreen">Dashboard</a>
+  <a href="/adminScreen/devices">Devices</a>
+  <a href="/admin/policies">Energy Policies</a>
+  <a href="/admin/analytics">Analytics</a>
+  <a href="/logout">Logout</a>
+</div>
+
+<div class="header">
+  <h1>Admin Home</h1>
+  <div style="display:flex;align-items:center;gap:15px;">
+    <div>Logged in as: <b th:text="${userDetails}"></b></div>
+    <div class="theme-switch" onclick="toggleTheme()" title="Toggle Theme"></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="system-context">
+    System Status: <span class="ok">Operational</span> · Last data sync: <b>Just now</b>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0;">Overview</h2>
+    <p style="color:var(--muted); margin:6px 0 0;">
+      This panel provides administrative access to monitor system health,
+      manage users and devices, and review energy analytics across the platform.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0;">Administration</h2>
+
+    <div class="admin-actions">
+
+      <!-- ORDER MATCHES SIDEBAR -->
+      <div class="action-box">
+        <h3>Admin Dashboard</h3>
+        <p>Users, system status, and alerts</p>
+        <a href="/adminScreen">Open Dashboard</a>
+      </div>
+
+      <div class="action-box">
+        <h3>Device Management</h3>
+        <p>Manage registered devices</p>
+        <a href="/adminScreen/devices">Manage Devices</a>
+      </div>
+
+      <div class="action-box">
+        <h3>Energy Policies</h3>
+        <p>Create and manage system energy rules</p>
+        <a href="/admin/policies">Open Policies</a>
+      </div>
+
+      <div class="action-box">
+        <h3>System Analytics</h3>
+        <p>Energy trends and consumption</p>
+        <a href="/admin/analytics">View Analytics</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
+

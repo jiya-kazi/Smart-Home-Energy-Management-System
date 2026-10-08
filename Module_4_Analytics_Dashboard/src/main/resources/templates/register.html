@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>SHEMS – Register</title>
+
+<style>
+/* ================= THEME ================= */
+:root{
+  --bg:#f4f7fb;
+  --primary:#2563eb;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --border:#c7d2fe;
+}
+
+/* ================= BASE ================= */
+*{ box-sizing:border-box }
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(37,99,235,.08), transparent),
+    var(--bg);
+  font-family:Segoe UI, Inter, Arial, sans-serif;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ================= CARD ================= */
+.card{
+  width:100%;
+  max-width:460px;
+  padding:42px 36px;
+  background:var(--card);
+  border-radius:22px;
+  box-shadow:
+    0 40px 80px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.6);
+  position:relative;
+}
+
+/* top accent */
+.card::before{
+  content:"";
+  position:absolute;
+  top:0; left:0; right:0;
+  height:5px;
+  background:linear-gradient(90deg,#2563eb,#1e40af);
+  border-radius:22px 22px 0 0;
+}
+
+/* ================= BRAND ================= */
+.brand{
+  text-align:center;
+  margin-bottom:28px;
+}
+
+.logo{
+  width:56px;
+  height:56px;
+  margin:0 auto 16px;
+  border-radius:16px;
+  background:#2563eb;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 12px 26px rgba(37,99,235,.4);
+}
+
+.logo svg{
+  width:30px;
+  height:30px;
+  fill:white;
+}
+
+.brand h3{
+  margin:0;
+  font-size:21px;
+  font-weight:600;
+}
+
+.brand p{
+  margin-top:6px;
+  font-size:13.5px;
+  color:var(--muted);
+}
+
+/* ================= FORM ================= */
+label{
+  font-size:13.5px;
+  color:var(--muted);
+  font-weight:500;
+}
+
+input, select{
+  width:100%;
+  padding:13px 14px;
+  margin-top:6px;
+  margin-bottom:18px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:transparent;
+  color:var(--text);
+}
+
+input:focus, select:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(37,99,235,.25);
+}
+
+/* ================= BUTTON ================= */
+button{
+  width:100%;
+  padding:14px;
+  background:linear-gradient(90deg,#2563eb,#1e40af);
+  border:none;
+  color:white;
+  border-radius:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.25s;
+}
+
+button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 14px 28px rgba(37,99,235,.35);
+}
+
+/* ================= SUCCESS ================= */
+.success{
+  background:rgba(22,163,74,.15);
+  color:#16a34a;
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+  margin-bottom:18px;
+  font-size:14px;
+}
+
+/* ================= LINKS ================= */
+.links{
+  text-align:center;
+  margin-top:22px;
+  font-size:14px;
+}
+
+.links a{
+  color:var(--primary);
+  text-decoration:none;
+  font-weight:500;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <!-- BRAND -->
+  <div class="brand">
+    <div class="logo">
+      <!-- FILLED HOME ICON -->
+      <svg viewBox="0 0 24 24">
+        <path d="M12 3L2 12h3v8h6v-5h2v5h6v-8h3z"/>
+      </svg>
+    </div>
+    <h3>Create Account</h3>
+    <p>Smart Home Energy Management System</p>
+  </div>
+
+  <!-- SUCCESS MESSAGE -->
+  <div class="success" th:if="${param.success}">
+    Registration successful. Please login.
+  </div>
+
+  <!-- UNCHANGED LOGIC -->
+  <form th:action="@{/registration}" method="post" th:object="${user}">
+    <label>Full Name</label>
+    <input th:field="*{name}" required>
+
+    <label>Email</label>
+    <input th:field="*{email_id}" required>
+
+    <label>Password</label>
+    <input type="password" th:field="*{password}" required>
+
+    <label>Role</label>
+    <select th:field="*{role}">
+      <option value="USER">USER</option>
+      <option value="ADMIN">ADMIN</option>
+    </select>
+
+    <button>Register</button>
+  </form>
+
+  <div class="links">
+    Already have an account?
+    <a th:href="@{/login}">Back to Login</a>
+  </div>
+
+</div>
+
+</body>
+</html>

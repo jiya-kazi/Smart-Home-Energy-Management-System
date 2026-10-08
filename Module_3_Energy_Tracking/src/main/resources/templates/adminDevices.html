@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>SHEMS – Admin Device Control</title>
+
+<style>
+:root{
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --primary:#2563eb;
+  --danger:#dc2626;
+  --success:#16a34a;
+  --sidebar:#0f172a;
+}
+
+body.dark{
+  --bg:#0b1220;
+  --card:#111827;
+  --text:#f8fafc;
+  --muted:#9ca3af;
+  --primary:#3b82f6;
+}
+
+body{
+  margin:0;
+  font-family:Segoe UI, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:.3s;
+}
+
+/* Sidebar */
+.sidebar{
+ width:220px;
+ height:100vh;
+ background:var(--sidebar);
+ color:white;
+ position:fixed;
+ padding-top:30px;
+}
+.sidebar h2{
+ text-align:center;
+ margin-bottom:30px;
+ letter-spacing:1px;
+}
+.sidebar a{
+ display:block;
+ color:#cbd5e1;
+ padding:12px 25px;
+ text-decoration:none;
+ font-size:15px;
+}
+.sidebar a:hover{background:#1e293b;color:white}
+
+/* Header */
+.header{
+ margin-left:220px;
+ background:var(--primary);
+ color:white;
+ padding:20px 30px;
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+}
+.header h1{margin:0;font-size:22px}
+
+/* Theme Switch */
+.theme-switch{
+ width:46px;
+ height:24px;
+ background:#bfdbfe;
+ border-radius:20px;
+ position:relative;
+ cursor:pointer;
+}
+.theme-switch::before{
+ content:"";
+ position:absolute;
+ width:18px;
+ height:18px;
+ background:white;
+ border-radius:50%;
+ top:3px;
+ left:3px;
+ transition:.3s;
+}
+body.dark .theme-switch{background:#60a5fa;}
+body.dark .theme-switch::before{transform:translateX(22px);}
+
+/* Main */
+.main{
+ margin-left:220px;
+ padding:30px;
+}
+
+/* Buttons */
+.btn{
+ padding:8px 14px;
+ border-radius:6px;
+ text-decoration:none;
+ font-weight:600;
+ font-size:13px;
+ margin-right:6px;
+ display:inline-block;
+}
+
+.toggle-btn{ background:var(--primary); color:white; }
+.delete-btn{ background:var(--danger); color:white; }
+
+.report-btn{
+  background:#16a34a;
+  color:white;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.report-btn:hover{ opacity:.9; }
+
+.back-btn{
+ color:var(--primary);
+ text-decoration:none;
+ font-weight:600;
+}
+
+/* Cards */
+.card{
+ background:var(--card);
+ padding:20px;
+ border-radius:12px;
+ box-shadow:0 4px 12px rgba(0,0,0,.08);
+ margin-bottom:25px;
+}
+
+/* Table */
+table{
+ width:100%;
+ border-collapse:collapse;
+ background:var(--card);
+ border-radius:12px;
+ overflow:hidden;
+ box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+th,td{padding:14px 16px;text-align:left}
+th{background:#e0e7ff;color:#1e3a8a;font-size:14px}
+tr:nth-child(even){background:rgba(0,0,0,0.02)}
+
+.status-on{ color:var(--success); font-weight:600; }
+.status-off{ color:var(--danger); font-weight:600; }
+
+.usage-low{ background:#dcfce7; color:#166534; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+.usage-medium{ background:#fef9c3; color:#854d0e; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+.usage-high{ background:#fee2e2; color:#991b1b; padding:5px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme",
+    document.body.classList.contains("dark") ? "dark":"light");
+}
+window.onload=function(){
+  if(localStorage.getItem("theme")==="dark"){
+    document.body.classList.add("dark");
+  }
+};
+</script>
+</head>
+
+<body>
+
+<div class="sidebar">
+ <h2>SHEMS</h2>
+ <a href="/admin">Home</a>
+ <a href="/adminScreen">Dashboard</a>
+ <a href="/adminScreen/devices">Devices</a>
+ <a href="/admin/policies">Energy Policies</a>
+ <a href="/admin/analytics">Analytics</a> <!-- ✅ NEW -->
+ <a href="/logout">Logout</a>
+</div>
+
+<div class="header">
+ <h1>Admin – Device Management</h1>
+ <div style="display:flex;align-items:center;gap:15px;">
+   <div>System Device Control Panel</div>
+   <div class="theme-switch" onclick="toggleTheme()" title="Toggle Theme"></div>
+ </div>
+</div>
+
+<div class="main">
+
+ <!-- 🔹 TOP ACTION BAR -->
+ <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+   <a href="/adminScreen" class="back-btn">← Back to Dashboard</a>
+
+   <a href="/adminScreen/devices/report" class="btn report-btn">
+     ⬇ Download Energy Report (PDF)
+   </a>
+ </div>
+
+ <!-- 📊 ENERGY GRAPH -->
+ <div class="card">
+  <h3 style="margin-bottom:15px;">Today's Energy Usage Per Device (kWh)</h3>
+  <canvas id="energyChart" height="100"></canvas>
+ </div>
+
+ <!-- 📋 DEVICE TABLE -->
+ <table>
+  <tr>
+   <th>Device Name</th>
+   <th>Type</th>
+   <th>Location</th>
+   <th>Power (W)</th>
+   <th>Energy Today</th>
+   <th>Usage Level</th>
+   <th>Owner</th>
+   <th>Status</th>
+   <th>Actions</th>
+  </tr>
+
+  <tr th:each="device : ${devices}">
+   <td th:text="${device.name}"></td>
+   <td th:text="${device.type}"></td>
+   <td th:text="${device.location}"></td>
+   <td th:text="${device.powerRating} + ' W'"></td>
+   <td th:text="${#numbers.formatDecimal(deviceEnergyMap[device.id],1,3)} + ' kWh'"></td>
+
+   <td>
+     <span th:text="${deviceUsageLevelMap[device.id]}"
+           th:classappend="
+             ${deviceUsageLevelMap[device.id] == 'LOW'} ? 'usage-low' :
+             (${deviceUsageLevelMap[device.id] == 'MEDIUM'} ? 'usage-medium' : 'usage-high')">
+     </span>
+   </td>
+
+   <td th:text="${device.user.name}"></td>
+
+   <td>
+     <span th:if="${device.status}" class="status-on">ON</span>
+     <span th:unless="${device.status}" class="status-off">OFF</span>
+   </td>
+
+   <td>
+     <a th:href="@{'/devices/admin/toggle/' + ${device.id}}" class="btn toggle-btn">Toggle</a>
+     <a th:href="@{'/devices/admin/delete/' + ${device.id}}" class="btn delete-btn">Delete</a>
+   </td>
+  </tr>
+ </table>
+
+</div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+    const deviceNames = [[${deviceNames}]];
+    const energyValues = [[${deviceEnergyValues}]];
+
+    const ctx = document.getElementById('energyChart').getContext('2d');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: deviceNames,
+            datasets: [{
+                label: 'Energy (kWh)',
+                data: energyValues,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+/*]]>*/
+</script>
+
+</body>
+</html>

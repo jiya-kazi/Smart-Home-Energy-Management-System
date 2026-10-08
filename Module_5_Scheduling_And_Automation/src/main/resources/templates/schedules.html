@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Device Scheduling | SHEMS</title>
+
+<style>
+:root {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --primary: #2563eb;
+  --primary-soft: #e0e7ff;
+  --border: #e5e7eb;
+}
+
+body.dark {
+  --bg: #0b1220;
+  --card: #111827;
+  --text: #f8fafc;
+  --muted: #9ca3af;
+  --border: #1f2937;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Segoe UI, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background: linear-gradient(180deg, #020617, #020617);
+  position: fixed;
+  padding: 28px 0;
+  color: white;
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 14px 32px;
+  color: #cbd5f5;
+  text-decoration: none;
+  font-size: 14px;
+  border-left: 3px solid transparent;
+}
+
+.sidebar a:hover {
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  border-left: 3px solid var(--primary);
+}
+
+.sidebar a.active {
+  background: rgba(255,255,255,0.05);
+  border-left: 3px solid var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.main { margin-left: 240px; }
+
+/* ===== TOPBAR ===== */
+.topbar {
+  height: 88px;
+  background: linear-gradient(90deg, #2563eb, #1e40af);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 42px;
+  color: white;
+}
+
+.topbar-left h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.topbar-left p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* ===== THEME SWITCH ===== */
+.theme-switch {
+  width: 46px;
+  height: 24px;
+  background: #bfdbfe;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+}
+.theme-switch::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: 0.3s;
+}
+body.dark .theme-switch { background: #60a5fa; }
+body.dark .theme-switch::before { transform: translateX(22px); }
+
+/* ===== CONTENT ===== */
+.content { padding: 40px 48px; }
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 28px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+}
+
+.card h2 { margin-top: 0; }
+
+input, select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-right: 10px;
+}
+
+button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.add-btn { background: var(--primary); color: white; }
+.toggle-btn { background: #f59e0b; color: white; }
+.delete-btn { background: #ef4444; color: white; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th, td {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+th { color: var(--muted); font-size: 13px; text-transform: uppercase; }
+</style>
+
+<script>
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme",
+    document.body.classList.contains("dark") ? "dark" : "light");
+}
+
+window.onload = function () {
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+  }
+
+  // 🔄 AUTO REFRESH EVERY 30 SECONDS TO SHOW LIVE STATUS
+  setInterval(function() {
+    location.reload();
+  }, 20000);
+};
+</script>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>SHEMS</h2>
+  <a href="/">Home</a>
+  <a href="/dashboard">Dashboard</a>
+  <a href="/devices">Devices</a>
+  <a href="/analytics">Analytics</a>
+  <a href="/schedules" class="active">Scheduling</a>
+  <a th:href="@{/logout}">Logout</a>
+</div>
+
+<div class="main">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Device Scheduling</h1>
+      <p>Automate your device ON/OFF timings</p>
+    </div>
+    <div class="theme-switch" onclick="toggleTheme()"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- ADD SCHEDULE -->
+    <div class="card">
+      <h2>Add New Schedule</h2>
+
+      <form th:action="@{/schedules/add}" method="post" th:object="${schedule}">
+        <select th:field="*{device}" required>
+          <option value="">Select Device</option>
+          <option th:each="d : ${devices}" th:value="${d.id}" th:text="${d.name}"></option>
+        </select>
+
+        <input type="time" th:field="*{onTime}" required>
+        <input type="time" th:field="*{offTime}" required>
+
+        <button type="submit" class="add-btn">Save Schedule</button>
+      </form>
+
+      <p style="color:var(--muted); margin-top:10px; font-size:13px;">
+        Time uses 24-hour format (Example: 13:00 = 1 PM)
+      </p>
+    </div>
+
+    <!-- SCHEDULE LIST -->
+    <div class="card">
+      <h2>Existing Schedules</h2>
+
+      <table>
+        <tr>
+          <th>Device</th>
+          <th>ON Time</th>
+          <th>OFF Time</th>
+          <th>Device Status</th>
+          <th>Actions</th>
+        </tr>
+
+        <tr th:each="s : ${schedules}">
+          <td th:text="${s.device.name}"></td>
+          <td th:text="${s.onTime}"></td>
+          <td th:text="${s.offTime}"></td>
+
+          <!-- ✅ LIVE DEVICE STATUS -->
+          <td>
+            <span th:if="${s.device.status}" style="color:#16a34a;font-weight:700;">ON</span>
+            <span th:unless="${s.device.status}" style="color:#dc2626;font-weight:700;">OFF</span>
+          </td>
+
+          <td>
+            <a th:href="@{'/schedules/toggle/' + ${s.id}}">
+              <button class="toggle-btn">Toggle</button>
+            </a>
+            <a th:href="@{'/schedules/delete/' + ${s.id}}">
+              <button class="delete-btn">Delete</button>
+            </a>
+          </td>
+        </tr>
+      </table>
+
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

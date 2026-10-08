@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard | SHEMS</title>
+
+<style>
+:root {
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --primary:#2563eb;
+  --sidebar:#0f172a;
+  --border:#e2e8f0;
+}
+
+body{
+  margin:0;
+  font-family:Segoe UI, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* Sidebar */
+.sidebar{
+ width:220px;
+ height:100vh;
+ background:var(--sidebar);
+ color:white;
+ position:fixed;
+ padding-top:30px;
+}
+.sidebar h2{
+ text-align:center;
+ margin-bottom:30px;
+ letter-spacing:1px;
+}
+.sidebar a{
+ display:block;
+ color:#cbd5e1;
+ padding:12px 25px;
+ text-decoration:none;
+ font-size:15px;
+}
+.sidebar a:hover{
+ background:#1e293b;
+ color:white;
+}
+.sidebar a.active{
+ background:#1e293b;
+ color:white;
+ font-weight:600;
+}
+
+/* Header */
+.header{
+ margin-left:220px;
+ background:var(--primary);
+ color:white;
+ padding:20px 30px;
+}
+.header h1{margin:0;font-size:22px}
+
+/* Main */
+.main{
+ margin-left:220px;
+ padding:30px;
+}
+
+/* Cards */
+.card{
+ background:var(--card);
+ border:1px solid var(--border);
+ border-radius:14px;
+ padding:28px;
+ margin-bottom:25px;
+ box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+.stats{
+ display:flex;
+ gap:25px;
+ flex-wrap:wrap;
+}
+
+.stat-box{
+ flex:1;
+ min-width:200px;
+ background:#eef2ff;
+ padding:20px;
+ border-radius:12px;
+}
+.stat-box h3{
+ margin:0;
+ font-size:14px;
+ color:var(--muted);
+}
+.stat-box p{
+ margin:8px 0 0;
+ font-size:22px;
+ font-weight:bold;
+ color:var(--primary);
+}
+</style>
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+ <h2>SHEMS</h2>
+ <a href="/dashboard" class="active">Dashboard</a>
+ <a href="/devices">My Devices</a>
+ <a href="/analytics">Analytics</a>
+ <a th:href="@{/logout}">Logout</a>
+</div>
+
+<!-- Header -->
+<div class="header">
+ <h1 th:text="'Welcome, ' + ${userName}">Welcome</h1>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+
+  <div class="card">
+    <h2>Device Overview</h2>
+    <div class="stats">
+      <div class="stat-box">
+        <h3>Total Devices</h3>
+        <p th:text="${totalDevices}">0</p>
+      </div>
+      <div class="stat-box">
+        <h3>Devices ON</h3>
+        <p th:text="${activeDevices}">0</p>
+      </div>
+      <div class="stat-box">
+        <h3>Devices OFF</h3>
+        <p th:text="${inactiveDevices}">0</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Welcome to Your Energy Dashboard</h2>
+    <p style="color:var(--muted); line-height:1.6;">
+      Here you can monitor connected devices, track electricity usage,
+      and view detailed analytics to optimize your energy consumption.
+    </p>
+  </div>
+
+</div>
+
+</body>
+</html>

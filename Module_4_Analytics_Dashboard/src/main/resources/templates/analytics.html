@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Analytics | SHEMS</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --primary: #2563eb;
+  --primary-soft: #e0e7ff;
+  --border: #e5e7eb;
+}
+
+body.dark {
+  --bg: #0b1220;
+  --card: #111827;
+  --text: #f8fafc;
+  --muted: #9ca3af;
+  --border: #1f2937;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Segoe UI, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background: linear-gradient(180deg, #020617, #020617);
+  position: fixed;
+  padding: 28px 0;
+  color: white;
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 14px 32px;
+  color: #cbd5f5;
+  text-decoration: none;
+  font-size: 14px;
+  border-left: 3px solid transparent;
+}
+
+.sidebar a:hover {
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  border-left: 3px solid var(--primary);
+}
+
+.sidebar a.active {
+  background: rgba(255,255,255,0.05);
+  border-left: 3px solid var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.main { margin-left: 240px; }
+
+/* ===== TOPBAR ===== */
+.topbar {
+  height: 88px;
+  background: linear-gradient(90deg, #2563eb, #1e40af);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 42px;
+  color: white;
+}
+
+.topbar-left h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.topbar-left p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* ===== THEME SWITCH ===== */
+.theme-switch {
+  width: 46px;
+  height: 24px;
+  background: #bfdbfe;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+}
+
+.theme-switch::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: 0.3s;
+}
+
+body.dark .theme-switch { background: #60a5fa; }
+body.dark .theme-switch::before { transform: translateX(22px); }
+
+/* ===== CONTENT ===== */
+.content { padding: 40px 48px; }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 26px;
+  margin-bottom: 30px;
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+.peak-box {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-top: 10px;
+}
+
+/* ===== RECOMMENDATIONS ===== */
+.rec-box {
+  background: #f8fafc;
+  border-left: 5px solid #3b82f6;
+  padding: 14px 18px;
+  margin-top: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.rec-box.success { border-left-color: #16a34a; background: #ecfdf5; }
+.rec-box.warning { border-left-color: #f59e0b; background: #fffbeb; }
+.rec-box.danger  { border-left-color: #dc2626; background: #fef2f2; }
+
+canvas { margin-top: 20px; }
+</style>
+
+<script>
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+}
+window.onload = function () {
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+  }
+};
+</script>
+</head>
+
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar">
+  <h2>SHEMS</h2>
+  <a href="/">Home</a>
+  <a href="/dashboard">Dashboard</a>
+  <a href="/devices">Devices</a>
+  <a href="/analytics" class="active">Analytics</a>
+  <a href="/schedules">Scheduling</a>
+  <a th:href="@{/logout}">Logout</a>
+</div>
+
+<div class="main">
+
+  <!-- ===== TOPBAR ===== -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 th:text="'Energy Analytics - ' + ${userDetails}">Energy Analytics</h1>
+      <p>Analyze trends and optimize your home’s energy efficiency.</p>
+    </div>
+    <div class="theme-switch" onclick="toggleTheme()"></div>
+  </div>
+
+  <!-- ===== CONTENT ===== -->
+  <div class="content">
+
+    <div class="card">
+      <h2>Last 7 Days Energy Usage</h2>
+      <canvas id="weeklyChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Last 6 Months Energy Usage</h2>
+      <canvas id="monthlyChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Today's Energy Usage per Device</h2>
+      <canvas id="deviceChart"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Peak Energy Usage Day</h2>
+      <div class="peak-box" th:text="${peakDay}">Monday (0 kWh)</div>
+    </div>
+
+    <div class="card">
+      <h2>Energy Saving Recommendations</h2>
+
+      <div th:if="${energyTips != null and !#lists.isEmpty(energyTips)}">
+
+        <div th:if="${energyTips[0].toLowerCase().contains('efficient')}" class="rec-box success">
+          <b>Excellent Efficiency Today</b><br/>Your energy usage is well optimized. Keep it up!
+        </div>
+
+        <div th:if="${energyTips[0].toLowerCase().contains('moderate')}" class="rec-box warning">
+          <b>Moderate Usage</b><br/>Turning off unused devices can help reduce consumption.
+        </div>
+
+        <div th:if="${energyTips[0].toLowerCase().contains('high')}" class="rec-box danger">
+          <b>High Energy Usage Alert</b><br/>Reduce heavy appliance usage to save energy.
+        </div>
+
+        <div class="rec-box" th:each="tip, stat : ${energyTips}" th:if="${stat.index > 0}">
+          <span th:text="${tip}"></span>
+        </div>
+      </div>
+
+      <div th:if="${energyTips == null or #lists.isEmpty(energyTips)}" class="rec-box">
+        <b>No Recommendations Today</b><br/>Your system has no special energy alerts at the moment.
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script th:inline="javascript">
+const weeklyLabels = [[${weeklyEnergy.keySet()}]];
+const weeklyData   = [[${weeklyEnergy.values()}]];
+
+new Chart(document.getElementById('weeklyChart'), {
+    type:'line',
+    data:{labels:weeklyLabels,datasets:[{label:'Energy (kWh)',data:weeklyData,borderWidth:2,fill:false,tension:0.3}]}
+});
+
+const monthlyLabels = [[${monthlyEnergy.keySet()}]];
+const monthlyData   = [[${monthlyEnergy.values()}]];
+
+new Chart(document.getElementById('monthlyChart'), {
+    type:'line',
+    data:{labels:monthlyLabels,datasets:[{label:'Monthly Energy (kWh)',data:monthlyData,borderWidth:2,fill:false,tension:0.3}]}
+});
+
+const deviceLabels = [[${deviceComparison.keySet()}]];
+const deviceData   = [[${deviceComparison.values()}]];
+
+new Chart(document.getElementById('deviceChart'), {
+    type:'bar',
+    data:{labels:deviceLabels,datasets:[{label:'Energy Today (kWh)',data:deviceData,borderWidth:1}]}
+});
+</script>
+
+</body>
+</html>

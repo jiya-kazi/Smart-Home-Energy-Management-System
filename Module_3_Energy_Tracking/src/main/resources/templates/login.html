@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>SHEMS – Login</title>
+
+<style>
+/* ================= THEME ================= */
+:root{
+  --bg:#f4f7fb;
+  --primary:#2563eb;
+  --card:#ffffff;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --border:#c7d2fe;
+}
+
+/* ================= BASE ================= */
+*{ box-sizing:border-box }
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(37,99,235,.08), transparent),
+    var(--bg);
+  font-family:Segoe UI, Inter, Arial, sans-serif;
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ================= CARD ================= */
+.card{
+  width:100%;
+  max-width:420px;
+  padding:42px 36px;
+  background:var(--card);
+  border-radius:22px;
+  box-shadow:
+    0 40px 80px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.6);
+  position:relative;
+}
+
+/* top accent */
+.card::before{
+  content:"";
+  position:absolute;
+  top:0; left:0; right:0;
+  height:5px;
+  background:linear-gradient(90deg,#2563eb,#1e40af);
+  border-radius:22px 22px 0 0;
+}
+
+/* ================= BRAND ================= */
+.brand{
+  text-align:center;
+  margin-bottom:28px;
+}
+
+.logo{
+  width:56px;
+  height:56px;
+  margin:0 auto 16px;
+  border-radius:16px;
+  background:#2563eb;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 12px 26px rgba(37,99,235,.4);
+}
+
+.logo svg{
+  width:30px;
+  height:30px;
+  fill:white;
+}
+
+.brand h3{
+  margin:0;
+  font-size:21px;
+  font-weight:600;
+}
+
+.brand p{
+  margin-top:6px;
+  font-size:13.5px;
+  color:var(--muted);
+}
+
+/* ================= FORM ================= */
+label{
+  font-size:13.5px;
+  color:var(--muted);
+  font-weight:500;
+}
+
+input{
+  width:100%;
+  padding:13px 14px;
+  margin-top:6px;
+  margin-bottom:18px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:transparent;
+  color:var(--text);
+}
+
+input:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(37,99,235,.25);
+}
+
+/* ================= BUTTON ================= */
+button{
+  width:100%;
+  padding:14px;
+  background:linear-gradient(90deg,#2563eb,#1e40af);
+  border:none;
+  color:white;
+  border-radius:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.25s;
+}
+
+button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 14px 28px rgba(37,99,235,.35);
+}
+
+/* ================= ERROR ================= */
+.error{
+  background:rgba(220,38,38,.12);
+  color:#dc2626;
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+  margin-bottom:18px;
+  font-size:14px;
+}
+
+/* ================= LINKS ================= */
+.links{
+  text-align:center;
+  margin-top:22px;
+  font-size:14px;
+}
+
+.links a{
+  color:var(--primary);
+  text-decoration:none;
+  font-weight:500;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <!-- BRAND -->
+  <div class="brand">
+    <div class="logo">
+      <!-- FILLED HOME ICON -->
+      <svg viewBox="0 0 24 24">
+        <path d="M12 3L2 12h3v8h6v-5h2v5h6v-8h3z"/>
+      </svg>
+    </div>
+    <h3>Login</h3>
+    <p>Smart Home Energy Management System</p>
+  </div>
+
+  <div class="error" th:if="${param.error}">
+    Invalid username or password
+  </div>
+
+  <!-- UNCHANGED LOGIC -->
+  <form th:action="@{/login}" method="post">
+    <label>Username</label>
+    <input name="username" required>
+
+    <label>Password</label>
+    <input type="password" name="password" required>
+
+    <button>Login</button>
+  </form>
+
+  <div class="links">
+    <a th:href="@{/forgot-password}">Forgot password?</a><br><br>
+    New user? <a th:href="@{/registration}">Create account</a>
+  </div>
+
+</div>
+
+</body>
+</html>

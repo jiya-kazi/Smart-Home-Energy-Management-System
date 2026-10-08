@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Home | SHEMS</title>
+
+<style>
+:root {
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --primary: #2563eb;
+  --border: #e5e7eb;
+}
+body.dark { --bg:#0b1220; --card:#111827; --text:#f8fafc; --muted:#9ca3af; --border:#1f2937; }
+body { margin:0;font-family:Inter,Segoe UI,system-ui,sans-serif;background:var(--bg);color:var(--text); }
+
+/* ===== Sidebar ===== */
+.sidebar { width:240px;height:100vh;background:#020617;position:fixed;padding:28px 0; }
+.sidebar h2 { text-align:center;margin-bottom:40px;font-size:18px;color:#fff; }
+.sidebar a { display:block;padding:14px 32px;color:#cbd5f5;text-decoration:none;font-size:14px;border-left:3px solid transparent;transition:all .2s ease;}
+.sidebar a:hover,.sidebar a.active { background:rgba(255,255,255,0.08);border-left:3px solid var(--primary);color:white;font-weight:600;padding-left:36px; }
+
+/* ===== Layout ===== */
+.main { margin-left:240px; }
+
+/* ===== Topbar ===== */
+.topbar {
+  height:88px;
+  background:linear-gradient(90deg,#2563eb,#1e40af);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 42px;
+  color:white;
+}
+.topbar-left h1{margin:0;font-size:22px;}
+.topbar-left p{margin:6px 0 0;font-size:13px;opacity:.9;}
+
+.theme-switch{width:46px;height:24px;background:#bfdbfe;border-radius:20px;position:relative;cursor:pointer;}
+.theme-switch::before{content:"";position:absolute;width:18px;height:18px;background:white;border-radius:50%;top:3px;left:3px;transition:.3s;}
+body.dark .theme-switch{background:#60a5fa;}
+body.dark .theme-switch::before{transform:translateX(22px);}
+
+/* ===== Content ===== */
+.content{padding:40px 48px;}
+
+/* ===== Card Style ===== */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:28px;
+  margin-bottom:32px;
+  box-shadow:0 10px 30px rgba(15,23,42,0.06);
+  transition:box-shadow .25s ease, transform .25s ease;
+}
+.card:hover{
+  box-shadow:0 14px 38px rgba(37,99,235,0.12);
+}
+body.dark .card{box-shadow:0 10px 30px rgba(0,0,0,0.6);}
+
+/* ===== Stats Grid ===== */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:22px;
+}
+
+.stat-card{
+  padding:18px 22px;
+  border-radius:12px;
+  transition:all .25s ease;
+  position:relative;
+}
+.stat-card:hover{
+  transform:translateY(-5px);
+  background:rgba(37,99,235,0.06);
+  box-shadow:0 12px 28px rgba(37,99,235,0.15);
+}
+.stat-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  height:100%;
+  width:0;
+  background:var(--primary);
+  border-radius:12px 0 0 12px;
+  transition:width .25s ease;
+}
+.stat-card:hover::before{
+  width:4px;
+}
+
+.stat-card h3{
+  font-size:12px;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin:0;
+}
+.stat-card p{
+  font-size:32px;
+  font-weight:700;
+  margin-top:12px;
+  color:var(--primary);
+  transition:transform .25s ease;
+}
+.stat-card:hover p{
+  transform:scale(1.08);
+}
+
+/* ===== Quick Actions ===== */
+.actions-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:22px;
+  margin-top:16px;
+}
+
+.action-box{
+  background:rgba(37,99,235,0.08);
+  border-left:4px solid var(--primary);
+  padding:18px;
+  border-radius:10px;
+  transition:all .25s ease;
+}
+.action-box:hover{
+  transform:translateY(-6px);
+  box-shadow:0 16px 40px rgba(37,99,235,0.18);
+  background:rgba(37,99,235,0.12);
+}
+
+.action-box h3{margin:0;font-size:15px;}
+.action-box p{margin:6px 0 14px;font-size:13px;color:var(--muted);}
+
+/* ===== Buttons ===== */
+.btn-primary{
+  background:var(--primary);
+  color:white;
+  padding:8px 16px;
+  border-radius:6px;
+  font-size:13px;
+  font-weight:600;
+  text-decoration:none;
+  display:inline-block;
+  transition:all .2s ease;
+}
+.btn-primary:hover{
+  background:#1d4ed8;
+  transform:translateY(-2px);
+  box-shadow:0 6px 14px rgba(37,99,235,0.35);
+}
+</style>
+
+<script>
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"light");
+}
+window.onload=function(){
+  if(localStorage.getItem("theme")==="dark"){
+    document.body.classList.add("dark");
+  }
+}
+</script>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>SHEMS</h2>
+  <a href="/" class="active">Home</a>
+  <a href="/dashboard">Dashboard</a>
+  <a href="/devices">Devices</a>
+  <a href="/analytics">Analytics</a>
+  <a href="/schedules">Scheduling</a>
+  <a th:href="@{/logout}">Logout</a>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1 th:text="'Welcome, ' + ${userName}">Welcome</h1>
+      <p>Your smart energy control center</p>
+    </div>
+    <div class="theme-switch" onclick="toggleTheme()"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- Device Stats -->
+    <div class="card">
+      <h2>Device Overview</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Total Devices</h3>
+          <p th:text="${totalDevices} ?: 0">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Active Devices</h3>
+          <p th:text="${activeDevices} ?: 0">0</p>
+        </div>
+        <div class="stat-card">
+          <h3>Inactive Devices</h3>
+          <p th:text="${inactiveDevices} ?: 0">0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <h2>Quick Actions</h2>
+      <div class="actions-grid">
+
+        <div class="action-box">
+          <h3>Energy Dashboard</h3>
+          <p>View today's energy usage and cost</p>
+          <a href="/dashboard" class="btn-primary">Open Dashboard</a>
+        </div>
+
+        <div class="action-box">
+          <h3>My Devices</h3>
+          <p>Manage and control your devices</p>
+          <a href="/devices" class="btn-primary">Manage Devices</a>
+        </div>
+
+        <div class="action-box">
+          <h3>Energy Analytics</h3>
+          <p>See trends and saving insights</p>
+          <a href="/analytics" class="btn-primary">View Analytics</a>
+        </div>
+
+        <div class="action-box">
+          <h3>Device Scheduling</h3>
+          <p>Automate ON/OFF timing</p>
+          <a href="/schedules" class="btn-primary">Open Scheduling</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
+
